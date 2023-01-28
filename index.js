@@ -15,8 +15,8 @@ app.get('/', (req, res) => {
     res.send('Hello H_R_Wells')
   })
 app.use('/api/auth',require('./routes/auth'));
-app.use('/api/notes',require('./routes/notes'));
+app.use('/api/posts',require('./routes/posts'));
 
 app.listen(port, () => {
-  console.log(`HRnotebook listening on port http://localhost:${port}`)
+  console.log(`CollegeQuora listening on port http://localhost:${port}`)
 })

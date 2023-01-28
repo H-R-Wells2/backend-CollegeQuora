@@ -15,6 +15,15 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    username: {
+        type: String,
+        required: true,
+        unique:true
+    },
+    collegeName: {
+        type: String,
+        required: true
+    },
     date:{
         type:Date,
         default:Date.now
