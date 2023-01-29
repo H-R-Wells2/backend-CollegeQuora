@@ -4,13 +4,15 @@ const router = express.Router();
 const Post = require("../models/Post");
 const { body, validationResult } = require('express-validator');
 const fetchuser = require("../middleware/fetchuser");
+const User = require("../models/User");
 
 
 
 // ROUTE 1 : Get all posts of all users using: GET "api/posts/getuser".
 router.get('/fetchallposts', async (req, res) => {
     try {
-        const posts = await Post.find();
+        const posts = await Post.find().populate('user');
+
         res.json(posts);
     } catch (error) {
         console.error(error.message);
@@ -148,5 +150,7 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
 
 })
+
+
 
 module.exports = router
