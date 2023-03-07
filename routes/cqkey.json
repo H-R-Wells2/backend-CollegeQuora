@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "collegequora-379021",
+  "private_key_id": "4ce036d1b6522d832e795071e2cfa60d8439b969",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCmSLPkI7slhOJ/\nfePNEOupDCUuqpNasdEkj3wM9/9pIkBS0v8uqNeCxNz9mfaC66QgR90i9D0p/P0q\nEtsHEcmyj/ayr4c6+iszELwo99BVs+5Gn4+bee2IIbCWM9naKu+OikHaV6wB4Gbo\nHuZjZxUjSa7p/U7nZiqSTHwIkVhHggPTpm3ys5rOcA24BUj14FiWS2oc+Xi3ab8M\n6eGGkY2qJ764UVghPt3jQn0UaX1DgLIJcCWtouwwl1M81IeYcOcvJcvE/P/8Ud+g\nJpH93ENysQfi7RICnGH2wYTrlRDDrUNJ+zynb514zHRnGLq3J6Zd9rpNQW0HUOjx\nFOudE2GLAgMBAAECggEAJkVKXeIZYw+7/4LOaLaRvoUEk8J/ipqtW4BImUWEu8I9\n0rIsOCV1AGxlvlpuoYAxdJqFm1NiNmU7MTFIxs5BwT6gFU0PzzOfuK+L1tP+V5ND\nbm6v4yVDVZcHaPKDG9LQ8toAQQv3kzD+DkN6W/twIoCFaOY7gEeD2csPqvskucQk\nI9lb2w7rlCfjHGKOIs3eLbQBjL7xePx5R1Eb+UYsWD7fUxDdaI2/PtOy4IoU/Wkj\nP1kl/DGhZvvTfjN7XG8csfBymYe357Ktns7knY+9T385wh4/kxJQ/M/voETCT2IN\nmxfVyuzEHs1MAgpptHOsxkwPHVuvpMElQVopayoApQKBgQDXmsktk4EcSQm6rSAB\njAmO8nq5nWD2/9DeTi1Woa2DED9v4oV0FIYzRrte2dfLwD81QB/2GCdt2Nlxsy5h\nproOGn/xHYM5Xc7VeX7cNrT0e4F4v8piVaWk0Mvl6DCgr5uy/JoTG2oQS4juunHK\niPeTeRVzH2UJoTpeZZXEcyOJZQKBgQDFcE/630Xu/Grx3RoSEn3YXtzP0Po8wqfM\n6qdoQX8913QSnm4RqfDJ1J0EaPjGA+cf9Q1lCDIJSJttiEZSewuP/TLIMoPTEdhP\nnk8OoMyCaameaAiy07i/N3nelmyiUEv3FVaf32WFGvpF/14OMrIpaqhYqXJ/rxbJ\ngNbttRoILwKBgQC9dQm1X/nDVjcTcBBA68J2d4L6Wl4bjh4HSyEyEC59jiiAc8gb\ngfGPW2dI6Rpks9GXRHsRcJYtQ7GH5RErxCuYOxcUVH+8SD95fSLJ9dS7RVA3QCli\nkapWExgpNgiNGuMxvCDUC3H/UbDJPtLBS+xqDauYlwzdEm1NB+08TIT8tQKBgQCo\niqSryrc/OJjumMjtjn2BHBGxEXrcLWri4ZlAxVCicO60Cix5xbE4Cdhz8EwVdTVy\nsVTa3zEffay4xvEI7eLD6ufTwFOJ9ZzK8qAYI6oQ1bQm9jYeud/m06ukGJLpyFPg\nu4Vz+lcGVi45XLJkumAePN8yuIt2dfek0egniUaMnwKBgEC7a3NJQ4ZXqqOdv8tC\nkZTkLG7xpvoy7i6BgdwTXGe5DKNl1LuGkhls6lwjsODhkRUVpw68hy1tJODN/aCf\n+zWY0BmrmKXj3k/PEiHsyFUMeZ1LpIX8nn5GIbI6ARD7+i3rRNkyjDe5t/CReaQG\nCl3YsRT8qx2/L3yrgJrV87NL\n-----END PRIVATE KEY-----\n",
+  "client_email": "collegequora@collegequora-379021.iam.gserviceaccount.com",
+  "client_id": "116526066216893671554",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/collegequora%40collegequora-379021.iam.gserviceaccount.com"
+}

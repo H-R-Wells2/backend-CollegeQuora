@@ -8,6 +8,11 @@ const User = require("../models/User");
 
 
 
+
+
+
+
+
 // ROUTE 1 : Get all posts of all users using: GET "api/posts/getuser".
 router.get('/fetchallposts', async (req, res) => {
     try {
@@ -35,8 +40,9 @@ router.get('/fetchallposts', async (req, res) => {
 // ROUTE 2 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
 router.post('/addpost', fetchuser, [
     body('title', 'Enter a valid title').isLength({ min: 3 }),
-    body('description', 'Enter a valid title').isLength({ min: 3 }),
+    body('description', 'Enter a valid description').isLength({ min: 3 }),
 ], async (req, res) => {
+
     const { title, description, tag } = req.body;
 
     try {
@@ -54,9 +60,9 @@ router.post('/addpost', fetchuser, [
 
         res.json(savedPost);
 
-
         // to get username of user
-        console.log(req.user.id);
+        // console.log(req.user.id);
+
 
     } catch (error) {
         console.error(error.message);

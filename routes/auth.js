@@ -35,7 +35,7 @@ router.get('/createuser', (req, res) => {
 // ROUTE 1:  Create a user using: POST "api/auth/createuser". No login required
 router.post('/createuser',
   [
-    body('name', 'Enter a valid name').isLength({ min: 2 }),
+    body('firstName', 'Enter a valid name').isLength({ min: 2 }),
     body('email', 'Enter a valid email').isEmail(),
     body('password', 'Password must be atleast 5 char').isLength({ min: 5 })
   ],
@@ -75,7 +75,8 @@ router.post('/createuser',
 
       // Create a user
       user = await User.create({
-        name: req.body.name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         email: req.body.email,
         password: secPass,
         username: req.body.username,
