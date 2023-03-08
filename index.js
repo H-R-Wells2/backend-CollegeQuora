@@ -9,6 +9,7 @@ const port = 5000
 
 app.use(cors())
 app.use(express.json())
+app.use('/uploads', express.static('uploads'))
 
 // Available Routes
 app.get('/', (req, res) => {

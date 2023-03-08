@@ -19,6 +19,9 @@ const PostsSchema = new Schema({
         required: true,
         default:"Genaral"
     },
+    idOfImage: {
+        type: String
+    },
     date:{
         type:Date,
         default:Date.now

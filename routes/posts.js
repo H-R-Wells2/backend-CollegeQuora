@@ -5,8 +5,34 @@ const Post = require("../models/Post");
 const { body, validationResult } = require('express-validator');
 const fetchuser = require("../middleware/fetchuser");
 const User = require("../models/User");
+const multer = require('multer');
+const fs = require('fs');
 
 
+
+// to upload image to google drive
+const { google } = require('googleapis')
+const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
+let idOfImage;
+
+
+
+
+
+
+
+
+// to temporary save image
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null,'./uploads/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
+    }
+});
+
+const upload = multer({ storage: storage});
 
 
 
@@ -38,38 +64,100 @@ router.get('/fetchallposts', async (req, res) => {
 
 
 // ROUTE 2 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
-router.post('/addpost', fetchuser, [
-    body('title', 'Enter a valid title').isLength({ min: 3 }),
-    body('description', 'Enter a valid description').isLength({ min: 3 }),
-], async (req, res) => {
+router.post('/addpost', fetchuser,
+    // [
+    //     body('title', 'Enter a valid title').isLength({ min: 3 }),
+    //     body('description', 'Enter a valid description').isLength({ min: 3 }),
+    // ],
+    upload.single('attachedImage'), async (req, res) => {
+        console.log(req.file);
 
-    const { title, description, tag } = req.body;
+        const { title, description, tag } = req.body;
 
-    try {
+        // saved in temporary folder
+        attachedImage = req.file.path;
 
-        // If there are errors , return bad request and errors
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+
+        try {
+
+            async function uploadFile(){
+                try{
+                    const auth = new google.auth.GoogleAuth({
+                        keyFile: './routes/cqkey.json',
+                        scopes: ['https://www.googleapis.com/auth/drive']
+                    })
+            
+                    const driveService = google.drive({
+                        version: 'v3',
+                        auth
+                    })
+            
+                    const fileMetaData = {
+                        'name': req.file.filename,
+                        'parents': [GOOGLE_API_FOLDER_ID]
+                    }
+            
+                    const media = {
+                        mimeType: 'image/jpg',
+                        body: fs.createReadStream(attachedImage)
+                    }
+            
+                    const response = await driveService.files.create({
+                        resource: fileMetaData,
+                        media: media,
+                        field: 'id'
+                    })
+                    return response.data.id
+            
+                }catch(err){
+                    console.log('Upload file error in google drive', err)
+                }
+            }
+            
+
+
+            await uploadFile().then(data => {
+                idOfImage = data;
+                //https://drive.google.com/uc?export=view&id=
+            })
+
+            
+
+            
+
+            // If there are errors , return bad request and errors
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ errors: errors.array() });
+            }
+
+            const post = new Post({
+                title, description, tag, idOfImage, user: req.user.id
+            });
+            const savedPost = await post.save();
+
+            res.json(savedPost);
+
+            // to get username of user
+            // console.log(req.user.id);
+
+            setTimeout(() => {
+                fs.unlink(attachedImage, (err) => {
+                    if (err) {
+                        throw err;
+                    }
+    
+                    console.log("Delete File successfully.");
+                });
+            }, 40000);
+
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send("Internal Server Error");
         }
 
-        const post = new Post({
-            title, description, tag, user: req.user.id
-        });
-        const savedPost = await post.save();
-
-        res.json(savedPost);
-
-        // to get username of user
-        // console.log(req.user.id);
-
-
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Internal Server Error");
-    }
-
-})
+    })
 
 
 
