@@ -1,7 +1,7 @@
 {
-  "name": "hrnotebook-backend",
+  "name": "college-quora-backend",
   "version": "1.0.0",
-  "description": "hrnotebook my notebook on cloud",
+  "description": "college-quora a platform to make connections to collegemates",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
