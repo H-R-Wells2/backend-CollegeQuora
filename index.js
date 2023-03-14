@@ -17,6 +17,7 @@ app.get('/', (req, res) => {
   })
 app.use('/api/auth',require('./routes/auth'));
 app.use('/api/posts',require('./routes/posts'));
+app.use('/api/comments',require('./routes/comments'));
 
 app.listen(port, () => {
   console.log(`CollegeQuora listening on port http://localhost:${port}`)

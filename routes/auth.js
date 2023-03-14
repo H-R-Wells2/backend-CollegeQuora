@@ -8,7 +8,7 @@ var jwt = require('jsonwebtoken');
 const fetchuser = require("../middleware/fetchuser");
 
 
-const JWT_SECRET = 'VijayKumar';
+const JWT_SECRET = 'HRWells';
 
 
 // Just a message on web page about what we are doing at this endpoint

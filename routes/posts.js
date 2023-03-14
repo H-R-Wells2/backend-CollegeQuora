@@ -4,7 +4,6 @@ const router = express.Router();
 const Post = require("../models/Post");
 const { body, validationResult } = require('express-validator');
 const fetchuser = require("../middleware/fetchuser");
-const User = require("../models/User");
 const multer = require('multer');
 const fs = require('fs');
 
@@ -14,8 +13,6 @@ const fs = require('fs');
 const { google } = require('googleapis')
 const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
 let idOfImage;
-
-
 
 
 
@@ -42,7 +39,7 @@ const upload = multer({ storage: storage });
 // ROUTE 1 : Get all posts of all users sorted by date in descending order using: GET "api/posts/fetchallposts".
 router.get('/fetchallposts', async (req, res) => {
     try {
-        const posts = await Post.find().sort({ date: -1 }).populate('user');
+        const posts = await Post.find().sort({ date: -1 }).populate('user').populate('comments');
 
         res.json(posts);
     } catch (error) {
@@ -50,6 +47,7 @@ router.get('/fetchallposts', async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 })
+
 
 
 
@@ -66,7 +64,7 @@ router.get('/search', async (req, res) => {
           { description: { $regex: description, $options: 'i' } },
           { tag: { $regex: tag, $options: 'i' } },
         ]
-      }).populate('user');
+      }).sort({ date: -1 }).populate('user');
   
       res.json(posts);
     } catch (error) {
@@ -82,7 +80,7 @@ router.get('/search', async (req, res) => {
 
 
 
-// ROUTE 2 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
+// ROUTE 3 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
 router.post('/addpost', fetchuser,
     // [
     //     body('title', 'Enter a valid title').isLength({ min: 3 }),
@@ -194,14 +192,7 @@ router.post('/addpost', fetchuser,
                 // to get username of user
                 // console.log(req.user.id);
 
-
             }
-
-
-
-
-
-
 
         } catch (error) {
             console.error(error.message);
@@ -218,13 +209,11 @@ router.post('/addpost', fetchuser,
 
 
 
-
-// ROUTE 3 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
+// ROUTE 4 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
 router.put('/updatepost/:id', fetchuser, async (req, res) => {
-    const { title, description, tag } = req.body;
+    const { title, description, tag, comments } = req.body;
 
     try {
-
         // Create newPost object
         const newPost = {};
         if (title) {
@@ -236,7 +225,9 @@ router.put('/updatepost/:id', fetchuser, async (req, res) => {
         if (tag) {
             newPost.tag = tag;
         }
-
+        if (comments) {
+            newPost.comments = comments;
+        }
 
         // Find the post which want to update and update it.
         let post = await Post.findById(req.params.id);
@@ -248,14 +239,15 @@ router.put('/updatepost/:id', fetchuser, async (req, res) => {
             return res.status(401).send("Not Allowed")
         }
 
-        post = await Post.findByIdAndUpdate(req.params.id, { $set: newPost }, { new: true });
+        post = await Post.findByIdAndUpdate(req.params.id, { $set: newPost }, { new: true }).populate('user').populate({
+            path: 'comments',
+            populate: { path: 'user' }
+        });
         res.json({ post });
     } catch (error) {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
-
-
 })
 
 
@@ -266,10 +258,7 @@ router.put('/updatepost/:id', fetchuser, async (req, res) => {
 
 
 
-
-
-
-// ROUTE 4 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
+// ROUTE 5 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
 router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
     try {

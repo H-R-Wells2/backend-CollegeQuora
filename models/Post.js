@@ -6,6 +6,7 @@ const PostsSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
+    
     title: {
         type: String,
         required: true
@@ -22,10 +23,15 @@ const PostsSchema = new Schema({
     idOfImage: {
         type: String
     },
+    comments: [{ 
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'comments'
+    }],
     date:{
         type:Date,
         default:Date.now
     }
 });
 
-module.exports = mongoose.model('posts', PostsSchema);
+const Post = mongoose.model('posts', PostsSchema);
+module.exports = Post;
