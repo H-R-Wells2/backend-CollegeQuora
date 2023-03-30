@@ -17,7 +17,6 @@ const PostsSchema = new Schema({
     },
     tag: {
         type: String,
-        required: true,
         default:"Genaral"
     },
     idOfImage: {

@@ -55,24 +55,24 @@ router.get('/fetchallposts', async (req, res) => {
 // ROUTE 2 : Get posts by searching the parameters
 router.get('/search', async (req, res) => {
     try {
-      const { title, description, tag } = req.query;
-  
-      // search for posts based on the given parameters
-      const posts = await Post.find({
-        $or: [
-          { title: { $regex: title, $options: 'i' } },
-          { description: { $regex: description, $options: 'i' } },
-          { tag: { $regex: tag, $options: 'i' } },
-        ]
-      }).sort({ date: -1 }).populate('user');
-  
-      res.json(posts);
+        const { title, description, tag } = req.query;
+
+        // search for posts based on the given parameters
+        const posts = await Post.find({
+            $or: [
+                { title: { $regex: title, $options: 'i' } },
+                { description: { $regex: description, $options: 'i' } },
+                { tag: { $regex: tag, $options: 'i' } },
+            ]
+        }).sort({ date: -1 }).populate('user');
+
+        res.json(posts);
     } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Internal Server Error');
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
     }
-  });
-  
+});
+
 
 
 
@@ -87,14 +87,17 @@ router.post('/addpost', fetchuser,
     //     body('description', 'Enter a valid description').isLength({ min: 3 }),
     // ],
     upload.single('attachedImage'), async (req, res) => {
+        if (!req.user) {
+            return res.status(401).json({ error: 'User not found, please login.' });
+        }
 
         const { title, description, tag } = req.body;
 
         // saved in temporary folder
-        if (req.file===undefined){
+        if (req.file === undefined) {
             attachedImage = null;
         }
-        else{
+        else {
             attachedImage = req.file.path;
         }
 

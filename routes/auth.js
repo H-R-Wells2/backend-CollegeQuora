@@ -6,6 +6,8 @@ const { response } = require("express");
 const bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
 const fetchuser = require("../middleware/fetchuser");
+const multer = require('multer');
+const fs = require('fs');
 
 
 const JWT_SECRET = 'HRWells';
@@ -61,7 +63,7 @@ router.post('/createuser',
       if (user) {
         return res.status(404).json({ error: "User already exist with this email id" })
       }
-      
+
       if (username) {
         return res.status(404).json({ error: "Username already exists, please try another one" })
       }
@@ -183,18 +185,114 @@ router.post('/login',
 
 
 
-
 // ROUTE 3 : Get loggedin user datils using: POST "api/auth/getuser". Login required.
 router.post('/getuser', fetchuser, async (req, res) => {
   try {
-    userId = req.user.id;
-    const user = await User.findById(userId).select("-password");
-    res.send(user);
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
+
+
+
+
+
+
+// to upload image to google drive
+const { google } = require('googleapis')
+const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
+
+
+
+// to temporary save image
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, './uploads/')
+  },
+  filename: function (req, file, cb) {
+      cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
+
+
+// ROUTE 4: Update user data using: PUT "api/users/update". Login required.
+router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req, res) => {
+  const userId = req.user.id;
+  const { firstName, lastName, username, collegeName } = req.body;
+
+  // saved in temporary folder
+  let idOfAvatar = null;
+  if (req.file !== undefined) {
+    try {
+      const auth = new google.auth.GoogleAuth({
+        keyFile: './routes/cqkey.json',
+        scopes: ['https://www.googleapis.com/auth/drive']
+      })
+
+      const driveService = google.drive({
+        version: 'v3',
+        auth
+      })
+
+      const fileMetaData = {
+        'name': req.file.filename,
+        'parents': [GOOGLE_API_FOLDER_ID]
+      }
+
+      const media = {
+        mimeType: 'image/jpg',
+        body: fs.createReadStream(req.file.path)
+      }
+
+      const response = await driveService.files.create({
+        resource: fileMetaData,
+        media: media,
+        field: 'id'
+      })
+      idOfAvatar = response.data.id;
+
+    } catch (err) {
+      console.log('Upload file error in google drive', err)
+    }
+  }
+
+  try {
+    let user = await User.findById(userId);
+    if (!user) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    user.firstName = firstName || user.firstName;
+    user.lastName = lastName || user.lastName;
+    user.username = username || user.username;
+    user.collegeName = collegeName || user.collegeName;
+    user.idOfAvatar = idOfAvatar || user.idOfAvatar;
+
+    const updatedUser = await user.save();
+    res.json(updatedUser);
 
   } catch (error) {
     console.error(error.message);
-    res.status(500).send("Internal Server Error")
+    res.status(500).send("Internal Server Error");
   }
 })
+
+
+
+
 
 module.exports = router
