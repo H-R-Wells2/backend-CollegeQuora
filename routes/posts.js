@@ -34,12 +34,18 @@ const upload = multer({ storage: storage });
 
 
 
-
-
-// ROUTE 1 : Get all posts of all users sorted by date in descending order using: GET "api/posts/fetchallposts".
 router.get('/fetchallposts', async (req, res) => {
     try {
-        const posts = await Post.find().sort({ date: -1 }).populate('user').populate('comments');
+        const posts = await Post.find()
+            .sort({ date: -1 })
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: 'username'
+                }
+            });
 
         res.json(posts);
     } catch (error) {
@@ -64,7 +70,7 @@ router.get('/search', async (req, res) => {
                 { description: { $regex: description, $options: 'i' } },
                 { tag: { $regex: tag, $options: 'i' } },
             ]
-        }).sort({ date: -1 }).populate('user');
+        }).sort({ date: -1 }).populate('user').populate('comments');
 
         res.json(posts);
     } catch (error) {
@@ -287,6 +293,36 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
 
 })
+
+
+
+
+
+
+
+
+// ROUTE 6: Get a single post by ID using: GET "api/posts/:id".
+router.get('/:id', async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id).populate('user').populate('comments');
+      
+      if (!post) {
+        return res.status(404).json({ msg: 'Post not found' });
+      }
+  
+      res.json(post);
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === 'ObjectId') {
+        return res.status(404).json({ msg: 'Post not found' });
+      }
+      res.status(500).send("Internal Server Error");
+    }
+  });
+
+  
+
+
 
 
 

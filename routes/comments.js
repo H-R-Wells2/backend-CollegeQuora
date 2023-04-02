@@ -10,7 +10,7 @@ const Post = require("../models/Post");
 
 
 
-
+// Route for Comment
 router.post('/addComment', fetchuser, async (req, res) => {
     const { comment, postId } = req.body;
 
