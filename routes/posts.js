@@ -70,7 +70,13 @@ router.get('/search', async (req, res) => {
                 { description: { $regex: description, $options: 'i' } },
                 { tag: { $regex: tag, $options: 'i' } },
             ]
-        }).sort({ date: -1 }).populate('user').populate('comments');
+        }).sort({ date: -1 }).populate('user').populate({
+            path: 'comments',
+            populate: {
+                path: 'user',
+                select: 'username'
+            }
+        });
 
         res.json(posts);
     } catch (error) {
@@ -304,7 +310,13 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 // ROUTE 6: Get a single post by ID using: GET "api/posts/:id".
 router.get('/:id', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('user').populate('comments');
+      const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
+        path: 'comments',
+        populate: {
+            path: 'user',
+            select: 'username'
+        }
+    });;
       
       if (!post) {
         return res.status(404).json({ msg: 'Post not found' });
