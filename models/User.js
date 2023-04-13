@@ -23,6 +23,14 @@ const UserSchema = new Schema({
         required: true,
         unique:true
     },
+    gender: {
+        type: String,
+        required: true
+    },
+    bio:{
+        type: String,
+        required: true
+    },
     collegeName: {
         type: String,
         required: true

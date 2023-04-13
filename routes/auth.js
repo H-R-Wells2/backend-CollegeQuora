@@ -82,7 +82,9 @@ router.post('/createuser',
         email: req.body.email,
         password: secPass,
         username: req.body.username,
-        collegeName: req.body.collegeName
+        collegeName: req.body.collegeName,
+        gender: req.body.gender,
+        bio: req.body.bio
       })
 
 
@@ -232,7 +234,7 @@ const upload = multer({ storage: storage });
 // ROUTE 4: Update user data using: PUT "api/users/update". Login required.
 router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req, res) => {
   const userId = req.user.id;
-  const { firstName, lastName, username, collegeName } = req.body;
+  const { firstName, lastName, username, collegeName, gender, bio } = req.body;
 
   // saved in temporary folder
   let idOfAvatar = null;
@@ -281,6 +283,8 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
     user.username = username || user.username;
     user.collegeName = collegeName || user.collegeName;
     user.idOfAvatar = idOfAvatar || user.idOfAvatar;
+    user.gender = gender || user.gender;
+    user.bio = bio || user.bio;
 
     const updatedUser = await user.save();
     res.json(updatedUser);
@@ -290,6 +294,30 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
     res.status(500).send("Internal Server Error");
   }
 })
+
+
+
+
+// ROUTE 5: Get a single user data by username using: GET "api/users/:username"
+router.get('/:username', async (req, res) => {
+  try {
+      const user = await User.findOne(
+          { username: req.params.username },
+          { password: 0, _id: 0 }
+      ).populate('posts');
+
+      if (!user) {
+          return res.status(404).json({ msg: 'User not found' });
+      }
+
+      res.json(user);
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 
 

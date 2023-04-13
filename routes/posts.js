@@ -17,8 +17,6 @@ let idOfImage;
 
 
 
-
-
 // to temporary save image
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -34,6 +32,10 @@ const upload = multer({ storage: storage });
 
 
 
+
+
+
+// ROUTE 1 : get all posts
 router.get('/fetchallposts', async (req, res) => {
     try {
         const posts = await Post.find()
@@ -57,8 +59,33 @@ router.get('/fetchallposts', async (req, res) => {
 
 
 
+// ROUTE 2 : get all posts with no comments
+router.get('/no-comments', async (req, res) => {
+    try {
+        const posts = await Post.find({ comments: [] })
+            .sort({ date: -1 })
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: 'username'
+                }
+            });
 
-// ROUTE 2 : Get posts by searching the parameters
+        res.json(posts);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
+
+
+// ROUTE 3 : Get posts by searching the parameters
 router.get('/search', async (req, res) => {
     try {
         const { title, description, tag } = req.query;
@@ -76,7 +103,7 @@ router.get('/search', async (req, res) => {
                 path: 'user',
                 select: 'username'
             }
-        });
+        }).sort({ date: -1 });
 
         res.json(posts);
     } catch (error) {
@@ -92,7 +119,7 @@ router.get('/search', async (req, res) => {
 
 
 
-// ROUTE 3 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
+// ROUTE 4 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
 router.post('/addpost', fetchuser,
     // [
     //     body('title', 'Enter a valid title').isLength({ min: 3 }),
@@ -224,7 +251,7 @@ router.post('/addpost', fetchuser,
 
 
 
-// ROUTE 4 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
+// ROUTE 5 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
 router.put('/updatepost/:id', fetchuser, async (req, res) => {
     const { title, description, tag, comments } = req.body;
 
@@ -273,7 +300,7 @@ router.put('/updatepost/:id', fetchuser, async (req, res) => {
 
 
 
-// ROUTE 5 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
+// ROUTE 6 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
 router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
     try {
@@ -307,32 +334,40 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
 
 
-// ROUTE 6: Get a single post by ID using: GET "api/posts/:id".
+// ROUTE 7 : Get a single post by ID using: GET "api/posts/:id".
 router.get('/:id', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
-        path: 'comments',
-        populate: {
-            path: 'user',
-            select: 'username'
-        }
-    });;
-      
-      if (!post) {
-        return res.status(404).json({ msg: 'Post not found' });
-      }
-  
-      res.json(post);
-    } catch (error) {
-      console.error(error.message);
-      if (error.kind === 'ObjectId') {
-        return res.status(404).json({ msg: 'Post not found' });
-      }
-      res.status(500).send("Internal Server Error");
-    }
-  });
+        const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
+            path: 'comments',
+            populate: {
+                path: 'user',
+                select: 'username'
+            }
+        });;
 
-  
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+
+        res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
+
+
+
+
+
+
+
+
 
 
 
