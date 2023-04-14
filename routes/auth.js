@@ -214,19 +214,20 @@ router.post('/getuser', fetchuser, async (req, res) => {
 const { google } = require('googleapis')
 const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
 
-
-
 // to temporary save image
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, './uploads/')
+    cb(null, './uploads/')
   },
   filename: function (req, file, cb) {
-      cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
+    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
   }
 });
 
 const upload = multer({ storage: storage });
+
+
+
 
 
 
@@ -301,22 +302,92 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
 // ROUTE 5: Get a single user data by username using: GET "api/users/:username"
 router.get('/:username', async (req, res) => {
   try {
-      const user = await User.findOne(
-          { username: req.params.username },
-          { password: 0, _id: 0 }
-      ).populate('posts');
+    const user = await User.findOne(
+      { username: req.params.username },
+      { password: 0, _id: 0 }
+    ).populate('posts');
 
-      if (!user) {
-          return res.status(404).json({ msg: 'User not found' });
-      }
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
 
-      res.json(user);
+    res.json(user);
   } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Internal Server Error');
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
   }
 });
 
+
+
+
+
+
+// ROUTE 6: To Follow User
+router.post('/:username/follow', fetchuser, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user.id);
+    const userToFollow = await User.findOne({ username: req.params.username });
+
+    if (!userToFollow) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Check if the current user is already following the user
+    if (userToFollow.followers.includes(currentUser.id) || currentUser.following.includes(userToFollow.id)) {
+      return res.status(400).json({ msg: 'Already following this user' });
+    }
+
+    // Add the current user's ID to the followers array of the user who is being followed
+    userToFollow.followers.push(currentUser.id);
+    await userToFollow.save();
+
+    // Add the user's ID to the following array of the current user
+    currentUser.following.push(userToFollow.id);
+    await currentUser.save();
+
+    res.json({ msg: `You are now following ${userToFollow.username}` });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
+
+// ROUTE 7: To Unfollow User
+router.post('/:username/unfollow', fetchuser, async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.user.id);
+    const userToUnfollow = await User.findOne({ username: req.params.username });
+
+    if (!userToUnfollow) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    // Check if the current user is already not following the user
+    if (!userToUnfollow.followers.includes(currentUser.id) || !currentUser.following.includes(userToUnfollow.id)) {
+      return res.status(400).json({ msg: 'You are not following this user' });
+    }
+
+    // Remove the current user's ID from the followers array of the user who is being unfollowed
+    const followerIndex = userToUnfollow.followers.indexOf(currentUser.id);
+    userToUnfollow.followers.splice(followerIndex, 1);
+    await userToUnfollow.save();
+
+    // Remove the user's ID from the following array of the current user
+    const followingIndex = currentUser.following.indexOf(userToUnfollow.id);
+    currentUser.following.splice(followingIndex, 1);
+    await currentUser.save();
+
+    res.json({ msg: `You have unfollowed ${userToUnfollow.username}` });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
 

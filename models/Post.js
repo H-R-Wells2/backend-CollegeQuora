@@ -25,6 +25,14 @@ const PostsSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'comments'
     }],
+    upvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }],
+      downvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }],
     date:{
         type:Date,
         default:Date.now

@@ -363,8 +363,66 @@ router.get('/:id', async (req, res) => {
 
 
 
+// Upvote a post
+router.post('/:postId/upvote', fetchuser, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.postId);
+
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.upvotes.includes(req.user.id)) {
+            return res.status(400).json({ error: 'Post already upvoted' });
+        }
+
+        // Remove the user's ID from the downvotes array of the post
+        if (post.downvotes.includes(req.user.id)) {
+            post.downvotes = post.downvotes.filter(id => id.toString() !== req.user.id.toString());
+        }
+
+        // Add the user's ID to the upvotes array of the post
+        post.upvotes.push(req.user.id);
+        await post.save();
+
+        res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
+
+
+
+// Downvote a post
+router.post('/:postId/downvote', fetchuser, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.postId);
+
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+
+        if (post.downvotes.includes(req.user.id)) {
+            return res.status(400).json({ error: 'Post already downvoted' });
+        }
+
+        if (post.upvotes.includes(req.user.id)) {
+            post.upvotes = post.upvotes.filter(id => id.toString() !== req.user.id.toString());
+        }
+
+        // Add the user's ID to the downvotes array of the post
+        post.downvotes.push(req.user.id);
+        await post.save();
+
+        res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 
 

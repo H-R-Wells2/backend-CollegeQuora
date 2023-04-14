@@ -5,14 +5,14 @@ const UserSchema = new Schema({
     firstName: {
         type: String,
         required: true
-    },lastName: {
+    }, lastName: {
         type: String,
         required: true
     },
     email: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
     password: {
         type: String,
@@ -21,13 +21,13 @@ const UserSchema = new Schema({
     username: {
         type: String,
         required: true,
-        unique:true
+        unique: true
     },
     gender: {
         type: String,
         required: true
     },
-    bio:{
+    bio: {
         type: String,
         required: true
     },
@@ -38,9 +38,17 @@ const UserSchema = new Schema({
     idOfAvatar: {
         type: String
     },
-    date:{
-        type:Date,
-        default:Date.now
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 
