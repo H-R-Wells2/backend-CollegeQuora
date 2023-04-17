@@ -45,7 +45,7 @@ router.get('/fetchallposts', async (req, res) => {
                 path: 'comments',
                 populate: {
                     path: 'user',
-                    select: 'username'
+                    select: ['username', 'idOfAvatar']
                 }
             });
 
@@ -69,7 +69,7 @@ router.get('/no-comments', async (req, res) => {
                 path: 'comments',
                 populate: {
                     path: 'user',
-                    select: 'username'
+                    select: ['username', 'idOfAvatar']
                 }
             });
 
@@ -102,7 +102,7 @@ router.get('/search', async (req, res) => {
                 path: 'comments',
                 populate: {
                     path: 'user',
-                    select: 'username'
+                    select: ['username', 'idOfAvatar']
                 }
             }).sort({ date: -1 });
 
@@ -123,7 +123,7 @@ router.get('/:id', async (req, res) => {
             path: 'comments',
             populate: {
                 path: 'user',
-                select: 'username'
+                select: ['username', 'idOfAvatar']
             }
         });;
 
@@ -155,7 +155,7 @@ router.get('/user/:userId', async (req, res) => {
                 path: 'comments',
                 populate: {
                     path: 'user',
-                    select: 'username'
+                    select: ['username', 'idOfAvatar']
                 }
             });
         res.json(posts);
@@ -295,9 +295,6 @@ router.post('/addpost', fetchuser,
 
                 res.json(savedPost);
 
-                // to get username of user
-                // console.log(req.user.id);
-
             }
 
         } catch (error) {
@@ -389,7 +386,7 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
     }
 
 
-})
+});
 
 
 
@@ -411,7 +408,7 @@ router.post('/:postId/upvote', fetchuser, async (req, res) => {
             path: 'comments',
             populate: {
                 path: 'user',
-                select: 'username'
+                select: ['username', 'idOfAvatar']
             }
         });
 
@@ -452,7 +449,7 @@ router.post('/:postId/downvote', fetchuser, async (req, res) => {
             path: 'comments',
             populate: {
                 path: 'user',
-                select: 'username'
+                select: ['username', 'idOfAvatar']
             }
         });
 

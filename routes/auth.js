@@ -225,7 +225,7 @@ router.post('/getuser', fetchuser, async (req, res) => {
 
 // to upload image to google drive
 const { google } = require('googleapis')
-const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
+const GOOGLE_API_FOLDER_ID = '1qOFwLy7giqBds9dp7kxHqXIe_RjBsae7'
 
 // to temporary save image
 const storage = multer.diskStorage({
@@ -280,6 +280,15 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
         field: 'id'
       })
       idOfAvatar = response.data.id;
+      
+      setTimeout(() => {
+        fs.unlink(req.file.path, (err) => {
+            if (err) {
+                throw err;
+            }
+            console.log("Delete File successfully.");
+        });
+    }, 5000);
 
     } catch (err) {
       console.log('Upload file error in google drive', err)
@@ -307,7 +316,7 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
     console.error(error.message);
     res.status(500).send("Internal Server Error");
   }
-})
+});
 
 
 
