@@ -182,6 +182,19 @@ router.post('/login',
 
 
 
+// Route to verify the validity of the auth token
+router.post('/verify', fetchuser, async (req, res) => {
+  try {
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send('Server Error');
+  }
+});
+
+
+
+
 
 
 
@@ -304,8 +317,8 @@ router.get('/:username', async (req, res) => {
   try {
     const user = await User.findOne(
       { username: req.params.username },
-      { password: 0, _id: 0 }
-    ).populate('posts');
+      { password: 0 }
+    )
 
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
@@ -388,6 +401,8 @@ router.post('/:username/unfollow', fetchuser, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+
 
 
 

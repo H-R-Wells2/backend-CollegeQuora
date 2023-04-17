@@ -84,8 +84,7 @@ router.get('/no-comments', async (req, res) => {
 
 
 
-
-// ROUTE 3 : Get posts by searching the parameters
+// ROUTE 5 : Get posts by searching the parameters
 router.get('/search', async (req, res) => {
     try {
         const { title, description, tag } = req.query;
@@ -97,13 +96,15 @@ router.get('/search', async (req, res) => {
                 { description: { $regex: description, $options: 'i' } },
                 { tag: { $regex: tag, $options: 'i' } },
             ]
-        }).sort({ date: -1 }).populate('user').populate({
-            path: 'comments',
-            populate: {
-                path: 'user',
-                select: 'username'
-            }
-        }).sort({ date: -1 });
+        }).sort({ date: -1 })
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: 'username'
+                }
+            }).sort({ date: -1 });
 
         res.json(posts);
     } catch (error) {
@@ -115,11 +116,74 @@ router.get('/search', async (req, res) => {
 
 
 
+// ROUTE 3 : Get a single post by ID using: GET "api/posts/:id".
+router.get('/:id', async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
+            path: 'comments',
+            populate: {
+                path: 'user',
+                select: 'username'
+            }
+        });;
+
+        if (!post) {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+
+        res.json(post);
+    } catch (error) {
+        console.error(error.message);
+        if (error.kind === 'ObjectId') {
+            return res.status(404).json({ msg: 'Post not found' });
+        }
+        res.status(500).send("Internal Server Error");
+    }
+});
 
 
 
 
-// ROUTE 4 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
+
+// ROUTE 4 : get all posts of single user
+router.get('/user/:userId', async (req, res) => {
+    try {
+        const posts = await Post.find({ user: req.params.userId })
+            .sort({ date: -1 })
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: 'username'
+                }
+            });
+        res.json(posts);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ROUTE 6 : Add posts of loggedin user using: POST "api/posts/addpost". Login required.
 router.post('/addpost', fetchuser,
     // [
     //     body('title', 'Enter a valid title').isLength({ min: 3 }),
@@ -251,7 +315,7 @@ router.post('/addpost', fetchuser,
 
 
 
-// ROUTE 5 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
+// ROUTE 7 : Update an existing post of loggedin user using: PUT "api/posts/updatepost". Login required.
 router.put('/updatepost/:id', fetchuser, async (req, res) => {
     const { title, description, tag, comments } = req.body;
 
@@ -300,7 +364,7 @@ router.put('/updatepost/:id', fetchuser, async (req, res) => {
 
 
 
-// ROUTE 6 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
+// ROUTE 8 : Delete a post of loggedin user using: DELETE "api/posts/deletepost". Login required.
 router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
     try {
@@ -334,39 +398,22 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 
 
 
-// ROUTE 7 : Get a single post by ID using: GET "api/posts/:id".
-router.get('/:id', async (req, res) => {
+
+
+
+
+// ROUTE 9 : Upvote a post
+router.post('/:postId/upvote', fetchuser, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
+        const post = await Post.findById(req.params.postId)
+        .populate('user')
+        .populate({
             path: 'comments',
             populate: {
                 path: 'user',
                 select: 'username'
             }
-        });;
-
-        if (!post) {
-            return res.status(404).json({ msg: 'Post not found' });
-        }
-
-        res.json(post);
-    } catch (error) {
-        console.error(error.message);
-        if (error.kind === 'ObjectId') {
-            return res.status(404).json({ msg: 'Post not found' });
-        }
-        res.status(500).send("Internal Server Error");
-    }
-});
-
-
-
-
-
-// Upvote a post
-router.post('/:postId/upvote', fetchuser, async (req, res) => {
-    try {
-        const post = await Post.findById(req.params.postId);
+        });
 
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
@@ -396,10 +443,18 @@ router.post('/:postId/upvote', fetchuser, async (req, res) => {
 
 
 
-// Downvote a post
+// ROUTE 10 : Downvote a post
 router.post('/:postId/downvote', fetchuser, async (req, res) => {
     try {
-        const post = await Post.findById(req.params.postId);
+        const post = await Post.findById(req.params.postId)
+        .populate('user')
+        .populate({
+            path: 'comments',
+            populate: {
+                path: 'user',
+                select: 'username'
+            }
+        });
 
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
@@ -423,6 +478,10 @@ router.post('/:postId/downvote', fetchuser, async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+
+
 
 
 
