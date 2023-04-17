@@ -50,6 +50,32 @@ router.post('/addComment', fetchuser, async (req, res) => {
 
 
 
+// Get all posts in which user commented
+router.get('/user/:userId/posts', async (req, res) => {
+    try {
+      const posts = await Post.find()
+        .populate({
+          path: 'comments',
+          populate: {
+            path: 'user',
+            match: { _id: req.params.userId }
+          }
+        })
+        .exec();
+  
+      const userPosts = posts.filter(post => {
+        return post.comments.some(comment => comment.user !== null);
+      });
+  
+      res.json(userPosts);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+  
+
+
 
 
 module.exports = router;

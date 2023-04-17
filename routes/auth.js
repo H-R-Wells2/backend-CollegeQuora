@@ -351,6 +351,11 @@ router.post('/:username/follow', fetchuser, async (req, res) => {
       return res.status(400).json({ msg: 'Already following this user' });
     }
 
+    // Check if the current user is trying to follow themselves
+    if (currentUser.id === userToFollow.id) {
+      return res.status(400).json({ msg: 'You cannot follow yourself' });
+    }
+
     // Add the current user's ID to the followers array of the user who is being followed
     userToFollow.followers.push(currentUser.id);
     await userToFollow.save();
@@ -365,6 +370,7 @@ router.post('/:username/follow', fetchuser, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 
