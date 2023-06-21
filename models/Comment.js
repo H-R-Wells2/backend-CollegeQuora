@@ -17,13 +17,17 @@ const CommentSchema = new Schema({
     votes: {
         type: Number
     },
-    createdAt: {
+    upvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    downvotes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    date: {
         type: Date,
-        default: Date.now,
-    },
-    date:{
-        type:Date,
-        default:Date.now
+        default: Date.now
     }
 });
 
