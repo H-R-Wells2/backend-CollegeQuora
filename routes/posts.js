@@ -275,9 +275,9 @@ router.post('/addpost', fetchuser,
                             throw err;
                         }
 
-                        console.log("Delete File successfully.");
+                        console.log("File deleted successfully.");
                     });
-                }, 10000);
+                }, 90000);
 
             }
             else {
