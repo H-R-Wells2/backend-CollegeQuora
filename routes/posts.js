@@ -226,8 +226,8 @@ router.post('/addpost', fetchuser,
                 async function uploadFile() {
                     try {
                         const auth = new google.auth.GoogleAuth({
-                            // keyFile: './routes/cqkey.json',
-                            keyFile: '/etc/secrets/',
+                            keyFile: './routes/cqkey.json',
+                            // keyFile: '/etc/secrets/',
                             scopes: ['https://www.googleapis.com/auth/drive']
                         })
 
@@ -238,7 +238,7 @@ router.post('/addpost', fetchuser,
 
                         const fileMetaData = {
                             'name': req.file.filename,
-                            'parents': [GOOGLE_API_FOLDER_ID]
+                            'parents': [process.env.GOOGLE_API_FOLDER_ID]
                         }
 
                         const media = {
