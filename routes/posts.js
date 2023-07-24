@@ -6,12 +6,14 @@ const { body, validationResult } = require('express-validator');
 const fetchuser = require("../middleware/fetchuser");
 const multer = require('multer');
 const fs = require('fs');
+require('dotenv').config();
+
 
 
 
 // to upload image to google drive
 const { google } = require('googleapis')
-const GOOGLE_API_FOLDER_ID = '1tb4d8fZUfRJWHTixZJdPYRsnlHmdau4j'
+const GOOGLE_API_FOLDER_ID = process.env.GOOGLE_API_FOLDER_ID
 let idOfImage;
 
 
@@ -38,8 +40,10 @@ const upload = multer({ storage: storage });
 // ROUTE 1 : get all posts
 router.get('/fetchallposts', async (req, res) => {
     try {
+        const limit = parseInt(req.query.limit) || 10;
         const posts = await Post.find()
             .sort({ date: -1 })
+            .limit(limit)
             .populate('user')
             .populate({
                 path: 'comments',
@@ -54,7 +58,8 @@ router.get('/fetchallposts', async (req, res) => {
         console.error(error.message);
         res.status(500).send("Internal Server Error");
     }
-})
+});
+
 
 
 
@@ -62,8 +67,10 @@ router.get('/fetchallposts', async (req, res) => {
 // ROUTE 2 : get all posts with no comments
 router.get('/no-comments', async (req, res) => {
     try {
+        const limit = parseInt(req.query.limit) || 10;
         const posts = await Post.find({ comments: [] })
             .sort({ date: -1 })
+            .limit(limit)
             .populate('user')
             .populate({
                 path: 'comments',
@@ -89,6 +96,7 @@ router.get('/search', async (req, res) => {
     try {
         const { title, description, tag } = req.query;
 
+        const limit = parseInt(req.query.limit) || 10;
         // search for posts based on the given parameters
         const posts = await Post.find({
             $or: [
@@ -97,6 +105,7 @@ router.get('/search', async (req, res) => {
                 { tag: { $regex: tag, $options: 'i' } },
             ]
         }).sort({ date: -1 })
+            .limit(limit)
             .populate('user')
             .populate({
                 path: 'comments',
@@ -119,7 +128,11 @@ router.get('/search', async (req, res) => {
 // ROUTE 3 : Get a single post by ID using: GET "api/posts/:id".
 router.get('/:id', async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id).populate('user').populate('comments').populate({
+        const post = await Post
+        .findById(req.params.id)
+        .populate('user')
+        .populate('comments')
+        .populate({
             path: 'comments',
             populate: {
                 path: 'user',
@@ -148,8 +161,10 @@ router.get('/:id', async (req, res) => {
 // ROUTE 4 : get all posts of single user
 router.get('/user/:userId', async (req, res) => {
     try {
+        const limit = parseInt(req.query.limit) || 10;
         const posts = await Post.find({ user: req.params.userId })
             .sort({ date: -1 })
+            .limit(limit)
             .populate('user')
             .populate({
                 path: 'comments',
@@ -211,7 +226,8 @@ router.post('/addpost', fetchuser,
                 async function uploadFile() {
                     try {
                         const auth = new google.auth.GoogleAuth({
-                            keyFile: './routes/cqkey.json',
+                            // keyFile: './routes/cqkey.json',
+                            keyFile: '/etc/secrets/',
                             scopes: ['https://www.googleapis.com/auth/drive']
                         })
 
@@ -403,14 +419,14 @@ router.delete('/deletepost/:id', fetchuser, async (req, res) => {
 router.post('/:postId/upvote', fetchuser, async (req, res) => {
     try {
         const post = await Post.findById(req.params.postId)
-        .populate('user')
-        .populate({
-            path: 'comments',
-            populate: {
-                path: 'user',
-                select: ['username', 'idOfAvatar']
-            }
-        });
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: ['username', 'idOfAvatar']
+                }
+            });
 
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
@@ -444,14 +460,14 @@ router.post('/:postId/upvote', fetchuser, async (req, res) => {
 router.post('/:postId/downvote', fetchuser, async (req, res) => {
     try {
         const post = await Post.findById(req.params.postId)
-        .populate('user')
-        .populate({
-            path: 'comments',
-            populate: {
-                path: 'user',
-                select: ['username', 'idOfAvatar']
-            }
-        });
+            .populate('user')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: ['username', 'idOfAvatar']
+                }
+            });
 
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
