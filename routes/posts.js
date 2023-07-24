@@ -227,7 +227,7 @@ router.post('/addpost', fetchuser,
                     try {
                         const auth = new google.auth.GoogleAuth({
                             // keyFile: './routes/cqkey.json',
-                            keyFile: '/etc/secrets/',
+                            keyFile: '/etc/secrets/cqkey.json',
                             scopes: ['https://www.googleapis.com/auth/drive']
                         })
 
