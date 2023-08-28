@@ -129,16 +129,16 @@ router.get('/search', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const post = await Post
-        .findById(req.params.id)
-        .populate('user')
-        .populate('comments')
-        .populate({
-            path: 'comments',
-            populate: {
-                path: 'user',
-                select: ['username', 'idOfAvatar']
-            }
-        });;
+            .findById(req.params.id)
+            .populate('user')
+            .populate('comments')
+            .populate({
+                path: 'comments',
+                populate: {
+                    path: 'user',
+                    select: ['username', 'idOfAvatar']
+                }
+            });;
 
         if (!post) {
             return res.status(404).json({ msg: 'Post not found' });

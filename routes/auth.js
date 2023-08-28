@@ -13,14 +13,6 @@ const fs = require('fs');
 const JWT_SECRET = 'HRWells';
 
 
-// Just a message on web page about what we are doing at this endpoint
-router.get('/createuser', (req, res) => {
-  res.send("We are creating a user at this endpoint");
-});
-
-
-
-
 
 
 
@@ -280,15 +272,15 @@ router.put('/updateuser', fetchuser, upload.single('attachedImage'), async (req,
         field: 'id'
       })
       idOfAvatar = response.data.id;
-      
+
       setTimeout(() => {
         fs.unlink(req.file.path, (err) => {
-            if (err) {
-                throw err;
-            }
-            console.log("Delete File successfully.");
+          if (err) {
+            throw err;
+          }
+          console.log("Delete File successfully.");
         });
-    }, 5000);
+      }, 5000);
 
     } catch (err) {
       console.log('Upload file error in google drive', err)

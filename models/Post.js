@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const PostsSchema = new Schema({
-    user:{
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'user'
     },
@@ -16,26 +16,26 @@ const PostsSchema = new Schema({
     },
     tag: {
         type: String,
-        default:"Genaral"
+        default: "Genaral"
     },
     idOfImage: {
         type: String
     },
-    comments: [{ 
+    comments: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'comments'
     }],
     upvotes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-      }],
-      downvotes: [{
+    }],
+    downvotes: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-      }],
-    date:{
-        type:Date,
-        default:Date.now
+    }],
+    date: {
+        type: Date,
+        default: Date.now
     }
 });
 

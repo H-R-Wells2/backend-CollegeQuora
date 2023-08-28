@@ -14,11 +14,11 @@ app.use('/uploads', express.static('uploads'))
 
 // Available Routes
 app.get('/', (req, res) => {
-    res.send('Hello it\'s H_R_Wells')
-  })
-app.use('/api/auth',require('./routes/auth'));
-app.use('/api/posts',require('./routes/posts'));
-app.use('/api/comments',require('./routes/comments'));
+  res.send('Hello it\'s H_R_Wells')
+})
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/posts', require('./routes/posts'));
+app.use('/api/comments', require('./routes/comments'));
 
 app.listen(port, () => {
   console.log(`CollegeQuora listening on ${process.env.HOST}`);

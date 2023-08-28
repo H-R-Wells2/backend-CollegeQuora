@@ -4,10 +4,10 @@ const mongoURI = process.env.MONGODB_URI;
 
 mongoose.set("strictQuery", false);
 mongoose.set("strictPopulate", false);
-const connectToMongo = ()=>{
-    mongoose.connect(mongoURI,()=>{
+const connectToMongo = () => {
+    mongoose.connect(mongoURI, () => {
         console.log("connected to mongo successfully");
     })
 }
 
-module.exports=connectToMongo;
+module.exports = connectToMongo;
