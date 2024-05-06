@@ -288,7 +288,7 @@ router.post('/addpost', fetchuser,
                 setTimeout(() => {
                     fs.unlink(attachedImage, (err) => {
                         if (err) {
-                            throw err;
+                            console.log(err);
                         }
 
                         console.log("File deleted successfully.");
